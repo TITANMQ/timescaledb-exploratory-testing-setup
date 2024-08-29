@@ -25,6 +25,11 @@ To specify a certain version e.g. `2.13`, you can run
 ./init_timescaledb_docker.sh -d {version}
 ```
 
+To get the connection details, you can run
+ ```
+./init_timescaledb_docker.sh -i
+```
+
 To see all the options (as mentioned above), you can run the help command
 ```
 ./setup.sh -?

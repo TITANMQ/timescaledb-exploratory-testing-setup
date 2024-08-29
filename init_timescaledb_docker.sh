@@ -4,6 +4,8 @@ set -eu -o pipefail
 
 container_name='timescale-exploration'
 timescaledb_version='2.16.1-pg15' # default version
+host='localhost'
+default_database='postgres'
 port='32800'
 
 
@@ -33,11 +35,34 @@ get_timescaledb_version() {
     fi
 }
 
+get_connection_info() {
+
+    if [[ "$(docker ps -a | grep -c $container_name)" -le 0 ]] || [[ -z "`docker inspect -f {{.State.Running}} $container_name`"=="healthy" ]] ; then
+        echo "Cannot get connection info. Container '$container_name' is not running."
+        exit 1
+    fi
+
+    if [[ -z "`docker inspect -f {{.State.Running}} $container_name`"=="healthy" ]]; then
+        echo "Container is not running."
+        exit 1
+    fi
+
+    echo "Connection info:"
+    echo "Host: $host"
+    echo "Port: $port"
+    echo "Database: $default_database" #default database
+    echo "Username: postgres" #default user
+    echo "Password: mysecretpassword"
+    echo "Connection string: jdbc:postgresql://localhost:$port/$default_database"
+}
+
 
 # Check for options being set via command-line arguments.
-while getopts 'd:?' flag; do
+while getopts 'd:i?' flag; do
   case "${flag}" in
   d) get_timescaledb_version ${OPTARG} ;;
+  i) get_connection_info
+     exit 0 ;;
   ?) print_usage
      exit 0 ;;
   *)
