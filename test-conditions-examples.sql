@@ -40,9 +40,11 @@ ALTER TABLE conditions SET (
 SELECT add_compression_policy('conditions', INTERVAL '7 days', initial_start := NOW());
 
 -- remove the compression policy
-SELECT remove_compression_policy('conditions');
+SELECT remove_compression_policy('conditions'); 
 
-
+-- Change the chunk time interval to 24 hours (1 day) for the conditions table 
+-- https://docs.timescale.com/use-timescale/latest/hypertables/change-chunk-intervals/
+SELECT set_chunk_time_interval('conditions', INTERVAL '24 hours');
 
 -- Show all chunks in the conditions table
 SELECT show_chunks('conditions');
