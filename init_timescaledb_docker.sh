@@ -13,6 +13,7 @@ print_usage() {
   echo "Usage: ./init_timescaledb_docker.sh [options]"
   echo "Options:"
   echo "   -d: Sets the TimescaleDB version of the container. Default is the latest verion."
+  echo "   -i: Shows the connection information for the container."
 }
 
 

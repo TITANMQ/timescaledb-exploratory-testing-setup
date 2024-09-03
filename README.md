@@ -32,5 +32,5 @@ To get the connection details, you can run
 
 To see all the options (as mentioned above), you can run the help command
 ```
-./setup.sh -?
+./init_timescaledb_docker.sh -?
 ```
