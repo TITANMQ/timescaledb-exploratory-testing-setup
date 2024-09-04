@@ -29,8 +29,10 @@ get_timescaledb_version() {
             timescaledb_version='2.14.1-pg15'
         elif [[ $1 =~ "2.13" ]]; then
              timescaledb_version='2.13.1-pg15'
+        elif [[ $1 =~ "ha" ]]; then
+            timescaledb_version='ha'
         else
-            echo "Invalid TimescaleDB version. Please use 2.16, 2.15, 2.14, or 2.13."
+            echo "Invalid TimescaleDB version. Please use ha, 2.16, 2.15, 2.14, or 2.13."
             exit 1
         fi
     fi
@@ -81,9 +83,15 @@ create_container() {
 
     docker rm --force $container_name
 
-    echo "Starting TimescaleDB $timescaledb_version Docker container..."
-
-    docker run -d --rm --name $container_name -e POSTGRES_PASSWORD=mysecretpassword -p $port:5432 timescale/timescaledb:$timescaledb_version
+    
+    if [[ "$timescaledb_version" =~ "ha" ]]; then
+        echo "Starting TimescaleDB-ha Docker container..."
+        docker run -d --rm --name $container_name -e POSTGRES_PASSWORD=mysecretpassword -p $port:5432 timescale/timescaledb-ha:pg15
+    else
+        echo "Starting TimescaleDB $timescaledb_version Docker container..."
+        docker run -d --rm --name $container_name -e POSTGRES_PASSWORD=mysecretpassword -p $port:5432 timescale/timescaledb:$timescaledb_version
+    fi
+    
     
     echo "Waiting for container to be healthy..."
 
