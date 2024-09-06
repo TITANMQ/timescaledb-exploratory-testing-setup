@@ -1,8 +1,8 @@
 -- create development database
-CREATE DATABASE development;
+CREATE DATABASE dev;
 
 -- create shadow database
 CREATE DATABASE shadow;
 
 -- create production database
-CREATE DATABASE production;
+CREATE DATABASE prod;
