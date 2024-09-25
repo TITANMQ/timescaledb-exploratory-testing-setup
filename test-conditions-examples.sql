@@ -1,25 +1,33 @@
 
 -- Create a table to store conditions data
 CREATE TABLE conditions (
-   time        TIMESTAMPTZ       NOT NULL,
-   location    TEXT              NOT NULL,
-   device      TEXT              NOT NULL,
-   temperature DOUBLE PRECISION  NULL,
-   humidity    DOUBLE PRECISION  NULL
+   time             TIMESTAMPTZ       NOT NULL,
+   location         TEXT              NOT NULL,
+   time_received    TIMESTAMPTZ       NOT NULL,
+   device           TEXT              NOT NULL,
+   temperature      DOUBLE PRECISION  NULL,
+   humidity         DOUBLE PRECISION  NULL
 );
 
 -- Create a hypertable on the conditions table with a time-based partitioning of 7 days (default)
 SELECT create_hypertable('conditions', by_range('time')); 
 
 -- Insert some random data into the conditions table
-INSERT INTO conditions (time, location, device, temperature, humidity)
+INSERT INTO conditions (time, location, time_received, device, temperature, humidity)
 SELECT
-     NOW() - (random() * INTERVAL '7 Days'),
+    (NOW() - (random() * INTERVAL '7 Days')) as t,
     (ARRAY['greenhouse', 'garage', 'office'])[1 + floor(random() * 3)::INTEGER],
+    NOW() - (random() * INTERVAL '1 hour')::INTERVAL,
     'sensor',
     20 + (random() * 15)::NUMERIC(5,2),  -- Temperature between 20°C and 35°C
     40 + (random() * 40)::NUMERIC(5,2)   -- Humidity between 40% and 80%
 FROM generate_series(1, 1000); 
+
+-- Add a dimension to the conditions table for time_received partitioning on a daily basis
+SELECT add_dimension('conditions', by_range('time_received', INTERVAL '1 day')); 
+
+--Add a dimension to the conditions table for location to partition data by space into two partitions 
+SELECT add_dimension('conditions', by_hash('location', 2));
 
 -- Insert a specific data point, this should create a new chunk 
 INSERT INTO conditions (time, location, device, temperature, humidity)
